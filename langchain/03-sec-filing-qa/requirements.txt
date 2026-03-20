@@ -8,6 +8,7 @@ langchain-community==0.0.9
 langchain-text-splitters==0.0.1
 
 # Embeddings (runs locally, no API key needed)
+langchain-huggingface==0.1.2
 sentence-transformers==2.2.2
 
 # Vector store
