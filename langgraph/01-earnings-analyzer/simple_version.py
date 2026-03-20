@@ -455,7 +455,7 @@ if __name__ == "__main__":
     
     # Run analysis
     # Uncomment this when you're ready to test:
-    # analyze_earnings("AAPL", "Q4 2024", max_depth=2)
+    analyze_earnings("AAPL", "Q4 2024", max_depth=2)
     
     # For now, just test the structure
     print("✓ Code structure is valid")

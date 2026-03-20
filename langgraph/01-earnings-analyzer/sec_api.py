@@ -22,6 +22,7 @@ class SECClient:
     """Client for interacting with SEC EDGAR API."""
     
     BASE_URL = "https://sec.gov"
+    SUBMISSION_URL = "https://data.sec.gov"
     
     def __init__(self, user_agent: str = "Educational Project contact@example.com"):
         """
@@ -91,7 +92,7 @@ class SECClient:
             Dictionary with company facts, or None if error
         """
         try:
-            url = f"{self.BASE_URL}/api/xbrl/companyfacts/CIK{cik}.json"
+            url = f"{self.SUBMISSION_URL}/api/xbrl/companyfacts/CIK{cik}.json"
             response = requests.get(url, headers=self.headers)
             response.raise_for_status()
             
@@ -115,7 +116,7 @@ class SECClient:
             Dictionary with submission history, or None if error
         """
         try:
-            url = f"{self.BASE_URL}/submissions/CIK{cik}.json"
+            url = f"{self.SUBMISSION_URL}/submissions/CIK{cik}.json"
             response = requests.get(url, headers=self.headers)
             response.raise_for_status()
             
@@ -155,22 +156,30 @@ class SECClient:
             return []
         
     def extract_net_income(self, facts: Dict) -> List[Dict]:
-        """
-        Extract net income data from company facts.
-        
-        TODO: Implement this function!
-        
-        Similar to extract_revenue but look for:
-        - "NetIncomeLoss" in us-gaap
-        
-        Args:
-            facts: Company facts dictionary
+        try:
+            # Change "Revenues" to "NetIncomeLoss"
+            income_data = facts["facts"]["us-gaap"]["NetIncomeLoss"]["units"]["USD"]
             
-        Returns:
-            List of net income entries
-        """
-        # TODO: Implement net income extraction
-        pass  # Remove this and add your code
+            # Rest is IDENTICAL to your revenue function
+            quarterly = [
+                item for item in income_data 
+                if item.get("fp") in ["Q1", "Q2", "Q3", "Q4"]
+            ]
+            
+            results = []
+            for item in quarterly:
+                results.append({
+                    "period": f"Q{item['fp'][1]} {item['fy']}",
+                    "value": item["val"],
+                    "date": item.get("filed", "")
+                })
+            
+            results.sort(key=lambda x: x["date"], reverse=True)
+            return results
+            
+        except KeyError as e:
+            print(f"Net income data not found: {e}")
+            return []
     
     def get_latest_metrics(self, ticker: str) -> Optional[Dict]:
         """
@@ -211,20 +220,22 @@ class SECClient:
             if not facts:
                 return None
             
-            # TODO: Extract metrics using the functions above
-            # revenues = self.extract_revenue(facts)
-            # net_incomes = self.extract_net_income(facts)
+            revenues = self.extract_revenue(facts)
+            net_incomes = self.extract_net_income(facts)
             
-            # TODO: Get the most recent values
-            # latest_revenue = revenues[0] if revenues else None
-            # latest_net_income = net_incomes[0] if net_incomes else None
+            # Get most recent
+            latest_revenue = revenues[0] if revenues else None
+            latest_net_income = net_incomes[0] if net_incomes else None
             
-            # TODO: Return structured data
+            # Return structured data
             return {
                 "ticker": ticker.upper(),
                 "company_name": company_name,
                 "cik": cik,
-                # Add more fields here
+                "revenue": latest_revenue["value"] if latest_revenue else 0,
+                "net_income": latest_net_income["value"] if latest_net_income else 0,
+                "period": latest_revenue["period"] if latest_revenue else "Unknown",
+                "filing_date": latest_revenue["date"] if latest_revenue else ""
             }
             
         except Exception as e:
