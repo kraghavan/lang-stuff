@@ -1,0 +1,253 @@
+UNITED STATES SECURITIES AND EXCHANGE COMMISSION
+Washington, D.C. 20549
+
+FORM 10-K
+
+ANNUAL REPORT PURSUANT TO SECTION 13 OR 15(d)
+OF THE SECURITIES EXCHANGE ACT OF 1934
+
+For the fiscal year ended September 28, 2024
+
+Commission File Number: 001-36743
+
+APPLE INC.
+(Exact name of Registrant as specified in its charter)
+
+California                                    94-2404110
+(State of incorporation)                      (I.R.S. Employer Identification No.)
+
+One Apple Park Way
+Cupertino, California 95014
+(408) 996-1010
+
+Securities registered pursuant to Section 12(b) of the Act:
+
+Common Stock, $0.00001 par value per share    AAPL    The Nasdaq Stock Market LLC
+
+================================================================================
+ITEM 1. BUSINESS
+================================================================================
+
+General
+
+Apple Inc. ("Apple") designs, manufactures, and markets smartphones, personal computers, tablets, wearables, and accessories. The Company also sells a variety of related services.
+
+Products
+
+iPhone
+iPhone is the Company's line of smartphones based on its iOS operating system. During 2024, the Company released iPhone 16, iPhone 16 Plus, iPhone 16 Pro, and iPhone 16 Pro Max featuring Apple Intelligence, the Company's personal intelligence system.
+
+Mac
+Mac is the Company's line of personal computers based on its macOS operating system. The Mac lineup includes MacBook Air, MacBook Pro, iMac, Mac mini, Mac Studio, and Mac Pro.
+
+iPad
+iPad is the Company's line of multi-purpose tablets based on its iPadOS operating system. The iPad lineup includes iPad Pro, iPad Air, iPad, and iPad mini.
+
+Wearables, Home and Accessories
+This category includes AirPods, Apple TV, Apple Watch, Beats products, HomePod, and accessories.
+
+Services
+The Company's services include advertising, AppleCare, cloud services, digital content, and payment services. Services revenue includes revenue from the App Store, Apple Music, Apple TV+, Apple Arcade, Apple Fitness+, Apple News+, Apple Card, and Apple Pay.
+
+Segments
+
+The Company manages its business on a geographic basis. The reportable segments consist of the Americas, Europe, Greater China, Japan, and Rest of Asia Pacific.
+
+Competition
+
+The markets for the Company's products and services are highly competitive and subject to rapid technological change. The Company's competitors include Samsung, Huawei, Google, Microsoft, Amazon, Meta, Sony, and many others.
+
+Employees
+
+As of September 28, 2024, the Company had approximately 164,000 full-time equivalent employees.
+
+================================================================================
+ITEM 1A. RISK FACTORS
+================================================================================
+
+The Company's business, reputation, results of operations, financial condition, and stock price can be affected by a number of factors. The following discussion highlights some of these factors.
+
+Macroeconomic and Industry Risks
+
+Global and regional economic conditions could materially adversely affect the Company. Uncertainty about global and regional economic conditions poses a risk as consumers and businesses may defer purchases. The Company's operations and performance depend significantly on global and regional economic conditions.
+
+The technology industry is subject to rapid change. The Company's success depends on its ability to develop innovative products and services. If the Company is unable to compete effectively, its business could be materially adversely affected.
+
+Business Risks
+
+The Company depends on the performance of distributors, carriers, and retailers. The Company distributes products through cellular network carriers, wholesalers, retailers, and resellers. Changes in the financial condition or business operations of these entities could adversely affect the Company.
+
+The Company depends on component and product manufacturing and logistical services provided by outsourcing partners, many of which are located outside of the U.S. Substantially all of the Company's manufacturing is performed by outsourcing partners located primarily in China, India, Japan, South Korea, Taiwan, and Vietnam.
+
+Future operating results depend upon the Company's ability to obtain components in sufficient quantities on commercially reasonable terms. The supply of components is subject to various risks including natural disasters, geopolitical tensions, trade restrictions, and public health issues.
+
+The Company faces substantial competition in all areas of its business. The Company's ability to compete depends upon the quality and performance of its products and services, pricing, marketing effectiveness, and the availability and quality of third-party digital content.
+
+Legal and Regulatory Risks
+
+The Company is subject to complex and evolving laws and regulations. These include laws regarding data privacy and security, antitrust and competition, content moderation, consumer protection, e-commerce, digital markets, taxation, and environmental matters.
+
+In particular, the European Union's Digital Markets Act ("DMA") designates the Company as a "gatekeeper" and requires compliance with various obligations, including allowing alternative app stores and payment systems on iOS.
+
+The Company faces litigation and government investigations. The Company is subject to various legal proceedings and government investigations, some of which may result in significant monetary damages or changes to the Company's business practices.
+
+Foreign Exchange Risk
+
+The Company's international operations expose it to fluctuations in foreign currency exchange rates. The weakening of foreign currencies relative to the U.S. dollar adversely affects the U.S. dollar value of the Company's foreign currency-denominated sales and earnings.
+
+================================================================================
+ITEM 6. SELECTED FINANCIAL DATA
+================================================================================
+
+                                    2024        2023        2022        2021        2020
+                                    ----        ----        ----        ----        ----
+Total net revenue ($M)            391,035     383,285     394,328     365,817     274,515
+Cost of sales ($M)                210,352     214,137     223,546     212,981     169,559
+Gross margin ($M)                 180,683     169,148     170,782     152,836     104,956
+Operating income ($M)             123,216     114,301     119,437     108,949      66,288
+Net income ($M)                   101,218      96,995     99,803      94,680      57,411
+
+Total assets ($M)                 364,980     352,583     352,755     351,002     323,888
+Total liabilities ($M)            290,437     290,020     302,083     287,912     258,549
+Shareholders' equity ($M)          74,543      62,563      50,672      63,090      65,339
+
+Earnings per share — diluted       $6.57       $6.13      $6.11       $5.61       $3.28
+Dividends per share                $0.99       $0.95      $0.90       $0.85       $0.80
+Shares outstanding (M)             15,408     15,813     16,326      16,865      17,528
+
+================================================================================
+ITEM 7. MANAGEMENT'S DISCUSSION AND ANALYSIS
+================================================================================
+
+Fiscal 2024 Highlights
+
+Total net revenue for fiscal 2024 was $391.0 billion, an increase of 2% compared to fiscal 2023. The increase was driven primarily by higher sales of Services and iPhone, partially offset by lower sales of Mac and iPad.
+
+Products revenue was $295.0 billion, a decrease of 1% compared to fiscal 2023:
+- iPhone revenue was $201.2 billion, an increase of 2% year-over-year
+- Mac revenue was $29.9 billion, a decrease of 3% year-over-year
+- iPad revenue was $26.7 billion, a decrease of 6% year-over-year
+- Wearables, Home and Accessories revenue was $37.2 billion, a decrease of 7% year-over-year
+
+Services revenue was $96.2 billion, an increase of 13% compared to fiscal 2023. The growth was driven by higher revenue from advertising, the App Store, and cloud services.
+
+Gross Margin
+
+Gross margin was $180.7 billion, an increase of 7% compared to fiscal 2023. Gross margin percentage was 46.2%, compared to 44.1% in fiscal 2023. The increase in gross margin percentage was driven primarily by cost savings and a favorable shift in mix toward Services, which carry higher margins.
+
+Products gross margin percentage was 36.9%, compared to 36.5% in fiscal 2023.
+Services gross margin percentage was 74.0%, compared to 70.8% in fiscal 2023.
+
+Operating Expenses
+
+Total operating expenses were $57.5 billion, a decrease of 2% compared to fiscal 2023:
+- Research and development expenses were $31.4 billion, an increase of 5% year-over-year
+- Selling, general and administrative expenses were $26.1 billion, a decrease of 9% year-over-year
+
+The increase in research and development expenses was driven primarily by increases in headcount-related expenses for the Company's AI and machine learning initiatives, including Apple Intelligence development.
+
+Operating Income
+
+Operating income was $123.2 billion, an increase of 8% compared to fiscal 2023. Operating margin was 31.5%, compared to 29.8% in fiscal 2023.
+
+Net Income
+
+Net income was $101.2 billion, an increase of 4% compared to fiscal 2023. Diluted earnings per share was $6.57, an increase of 7% compared to fiscal 2023.
+
+Segment Performance
+
+Americas segment revenue was $167.0 billion, an increase of 3%. Europe segment revenue was $101.3 billion, an increase of 7%. Greater China segment revenue was $67.0 billion, a decrease of 3%. Japan segment revenue was $25.0 billion, a decrease of 2%. Rest of Asia Pacific segment revenue was $30.7 billion, an increase of 4%.
+
+Liquidity and Capital Resources
+
+Cash, cash equivalents, and marketable securities were $140.6 billion as of September 28, 2024. The Company generated $118.3 billion in cash from operations during fiscal 2024.
+
+During fiscal 2024, the Company returned over $110 billion to shareholders through share repurchases of $94.9 billion and dividends and dividend equivalents of $15.2 billion.
+
+Capital Expenditures
+
+Capital expenditures were $9.9 billion during fiscal 2024. The Company anticipates capital expenditures to increase in future periods to support AI infrastructure and data center capacity.
+
+================================================================================
+ITEM 8. FINANCIAL STATEMENTS (CONDENSED)
+================================================================================
+
+CONSOLIDATED STATEMENTS OF OPERATIONS
+(In millions, except per share amounts)
+
+                                            2024            2023
+                                            ----            ----
+Net revenue:
+  Products                              $ 295,006       $ 298,085
+  Services                                 96,029          85,200
+    Total net revenue                     391,035         383,285
+
+Cost of sales:
+  Products                                185,886         189,282
+  Services                                 24,466          24,855
+    Total cost of sales                   210,352         214,137
+
+Gross margin                              180,683         169,148
+
+Operating expenses:
+  Research and development                 31,370          29,915
+  Selling, general and administrative      26,097          28,832
+    Total operating expenses               57,467          58,747
+
+Operating income                          123,216         114,301
+Other income/(expense), net                 1,298            (382)
+Income before provision for income taxes  124,514         113,919
+Provision for income taxes                 23,296          16,924
+Net income                              $ 101,218       $  96,995
+
+Earnings per share:
+  Basic                                    $ 6.61          $ 6.16
+  Diluted                                  $ 6.57          $ 6.13
+
+CONSOLIDATED BALANCE SHEETS
+(In millions)
+
+                                        September 28, 2024    September 30, 2023
+                                        ------------------    ------------------
+ASSETS
+Current assets:
+  Cash and cash equivalents              $  29,943            $  29,965
+  Short-term marketable securities          35,228               31,590
+  Accounts receivable, net                  66,243               60,985
+  Inventories                               7,286                6,331
+  Other current assets                      14,695               14,695
+    Total current assets                   153,395              143,566
+
+Non-current assets:
+  Long-term marketable securities           75,425               99,770
+  Property, plant and equipment, net        44,856               43,715
+  Other non-current assets                  91,304               65,532
+    Total non-current assets               211,585              209,017
+
+Total assets                            $ 364,980            $ 352,583
+
+LIABILITIES AND SHAREHOLDERS' EQUITY
+Current liabilities:
+  Accounts payable                       $  68,960            $  62,611
+  Other current liabilities                 78,304               77,891
+  Commercial paper                           9,967                5,985
+  Current portion of term debt              10,912               11,169
+    Total current liabilities              168,143              157,656
+
+Non-current liabilities:
+  Term debt                                 85,750               95,281
+  Other non-current liabilities             36,544               37,083
+    Total non-current liabilities          122,294              132,364
+
+Total liabilities                          290,437              290,020
+
+Shareholders' equity:
+  Common stock and additional paid-in
+    capital                                 83,276               73,812
+  Retained earnings/(Accumulated deficit)   (5,525)             (214)
+  Accumulated other comprehensive
+    income/(loss)                            (3,208)             (11,035)
+    Total shareholders' equity              74,543               62,563
+
+Total liabilities and shareholders'
+  equity                                $ 364,980            $ 352,583
