@@ -1,0 +1,21 @@
+# LangChain core
+langchain==0.1.0
+langchain-anthropic==0.1.1
+langchain-core==0.1.10
+langchain-community==0.0.9
+
+# Text splitting
+langchain-text-splitters==0.0.1
+
+# Embeddings (runs locally, no API key needed)
+langchain-huggingface==0.1.2
+sentence-transformers==2.2.2
+
+# Vector store
+faiss-cpu==1.7.4
+
+# Environment variables
+python-dotenv==1.0.0
+
+# Type hints
+typing-extensions==4.9.0

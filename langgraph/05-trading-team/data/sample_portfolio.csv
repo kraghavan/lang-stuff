@@ -1,0 +1,5 @@
+ticker,shares,cost_basis,sector
+AAPL,100,150.00,Technology
+MSFT,50,280.00,Technology
+JPM,40,140.00,Financials
+JNJ,30,160.00,Healthcare
