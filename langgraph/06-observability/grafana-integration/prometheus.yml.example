@@ -1,0 +1,25 @@
+# Add this scrape config to your existing prometheus.yml
+#
+# If using the docker-compose setup, this is already configured.
+# If adding to an existing Prometheus, copy the langsmith job below.
+
+global:
+  scrape_interval: 60s
+  evaluation_interval: 60s
+
+rule_files:
+  - "prometheus_alerts.yml"
+
+scrape_configs:
+  # Your existing scrapes (keep these)
+  # - job_name: 'application'
+  #   static_configs:
+  #     - targets: ['localhost:8000']
+
+  # LangSmith exporter
+  - job_name: 'langsmith'
+    static_configs:
+      - targets: ['langsmith-exporter:8001']  # Docker service name
+      # For non-Docker: use 'localhost:8001'
+    scrape_interval: 60s
+    scrape_timeout: 10s

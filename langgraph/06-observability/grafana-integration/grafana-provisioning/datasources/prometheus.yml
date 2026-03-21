@@ -1,0 +1,12 @@
+# Auto-provision Prometheus as a Grafana datasource
+# This means students don't need to manually add it in the UI.
+
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: true

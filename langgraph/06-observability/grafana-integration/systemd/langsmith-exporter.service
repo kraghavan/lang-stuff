@@ -1,0 +1,22 @@
+[Unit]
+Description=LangSmith Prometheus Exporter
+After=network.target
+
+[Service]
+Type=simple
+User=YOUR_USERNAME
+Group=YOUR_USERNAME
+WorkingDirectory=/path/to/langgraph/06-observability/grafana-integration
+Environment="LANGCHAIN_API_KEY=lsv2_pt_YOUR_KEY_HERE"
+Environment="LANGCHAIN_PROJECT=langgraph-learning"
+Environment="POLL_INTERVAL=60"
+ExecStart=/usr/bin/python3 prometheus_exporter.py
+Restart=always
+RestartSec=10
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=langsmith-exporter
+
+[Install]
+WantedBy=multi-user.target
