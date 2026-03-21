@@ -1,75 +1,48 @@
 # 📈 Stock Summary Generator
 
-A LangChain-powered tool that fetches real stock data and generates professional analyst-style summaries using Claude.
+A LangChain-powered tool that fetches real stock data and generates professional analyst-style summaries using Claude. All code is **complete and ready to run**.
 
 ## 🎯 What It Does
-
-Takes a stock ticker and produces a structured financial summary:
 
 1. Fetches real company financial data from SEC EDGAR (free, no API key)
 2. Formats the data into a prompt template
 3. Sends to Claude for intelligent analysis
 4. Parses the response into a clean, structured summary
 
-## 🌟 Why LangChain?
+## 🌟 Why LangChain (not LangGraph)?
 
-This is a **perfect LangChain use case** because:
+- ✅ **Linear flow** — Fetch → Format → Analyze → Output (no loops needed)
+- ✅ **Prompt templates** — Reusable prompt with variable injection
+- ✅ **Output parsing** — Convert Claude's response into structured data
+- ❌ No conditional branching, loops, or multi-agent coordination needed
 
-- ✅ **Linear flow** - Fetch → Format → Analyze → Output (no loops needed)
-- ✅ **Prompt templates** - Reusable prompt with variable injection
-- ✅ **Output parsing** - Convert Claude's response into structured data
-- ✅ **Single pass** - No need to revisit previous steps
-
-**Why NOT LangGraph?**
-- ❌ No conditional branching needed
-- ❌ No loops or iteration
-- ❌ No multi-agent coordination
-- ❌ No shared mutable state
-
-## 📁 Files in This Example
+## 📁 Files
 
 ```
 01-stock-summary/
-├── README.md                # This file
-├── LEARNING_GUIDE.md        # Step-by-step TODO tutorial
-├── requirements.txt         # Python dependencies
-├── simple_version.py        # Main implementation (has TODOs for learning)
-├── stock_data.py            # Stock data fetcher (SEC EDGAR)
+├── README.md              # This file
+├── requirements.txt       # Python dependencies
+├── simple_version.py      # Main LangChain implementation
+├── stock_data.py          # SEC EDGAR API client
 └── examples/
-    └── EXAMPLE_OUTPUTS.md   # Sample outputs for reference
+    └── EXAMPLE_OUTPUTS.md # Sample outputs for reference
 ```
 
 ## 🚀 Quick Start
 
-### 1. Install Dependencies
-
 ```bash
 cd langchain/01-stock-summary
 pip install -r requirements.txt
-```
-
-### 2. Set Up API Key
-
-```bash
 export ANTHROPIC_API_KEY="your-key-here"
-```
-
-### 3. Run It
-
-```bash
 python simple_version.py
-```
-
-You'll be prompted for a stock ticker:
-```
-📈 Stock Summary Generator
-Enter a stock ticker (e.g., AAPL, MSFT, TSLA): AAPL
+# Enter: AAPL
 ```
 
 ### Example Output
 
 ```
 📈 Stock Summary Generator
+========================================
 Enter a stock ticker (e.g., AAPL, MSFT, TSLA): AAPL
 
 📥 Fetching data for AAPL from SEC EDGAR...
@@ -80,12 +53,8 @@ Enter a stock ticker (e.g., AAPL, MSFT, TSLA): AAPL
 ✓ Analysis complete
 
 ════════════════════════════════════════════════════════
-                 AAPL — STOCK SUMMARY
+               AAPL — STOCK SUMMARY
 ════════════════════════════════════════════════════════
-
-Company: Apple Inc.
-Sector: Technology — Consumer Electronics
-
 📊 Key Metrics:
   Revenue (TTM):        $391.0B
   Net Income (TTM):     $101.2B
@@ -95,22 +64,13 @@ Sector: Technology — Consumer Electronics
   Revenue Growth (YoY): +5.2%
   Income Growth (YoY):  +8.1%
 
-💡 Analysis:
-  Apple continues to demonstrate strong profitability
-  with industry-leading margins. Revenue growth has
-  moderated but remains positive, driven by services
-  segment expansion offsetting slower hardware sales.
-
-⚖️  Outlook: Stable
-  The company's massive cash position and ecosystem
-  lock-in provide strong defensive characteristics.
-
+💡 Outlook: Stable
+  Apple's massive cash position and ecosystem lock-in
+  provide strong defensive characteristics.
 ════════════════════════════════════════════════════════
 ```
 
 ## 🏗️ Architecture
-
-### LangChain Flow (LCEL)
 
 ```
 ┌──────────────┐     ┌───────────────┐     ┌─────────────┐     ┌──────────────┐
@@ -120,190 +80,110 @@ Sector: Technology — Consumer Electronics
     stock_data.py        PromptTemplate       ChatAnthropic       StrOutputParser
 ```
 
-In LCEL (LangChain Expression Language), this looks like:
+In LCEL: `chain = prompt | llm | parser`
 
+---
+
+## 📖 Code Walkthrough
+
+Run the code first (`python simple_version.py`), then read along below.
+
+### `stock_data.py` — Data Layer
+
+**`get_company_cik(ticker)`** — Converts "AAPL" → SEC CIK number "0000320193". SEC identifies companies by CIK, not ticker. Makes a GET request to `https://www.sec.gov/files/company_tickers.json` and searches for the matching ticker.
+
+**`get_financial_facts(cik)`** — Fetches ALL financial data from SEC EDGAR XBRL API. Response is deeply nested: `facts → "facts" → "us-gaap" → concept_name → "units" → "USD" → [entries]`.
+
+**`extract_metric(facts, concept_names)`** — Navigates the nested SEC data to find the most recent value for a metric. Tries multiple XBRL concept names (companies use different names — Apple uses `"Revenues"` but others use `"RevenueFromContractWithCustomerExcludingAssessedTax"`).
+
+**`get_stock_data(ticker)`** — Convenience wrapper: CIK lookup → fetch facts → extract all metrics → format numbers.
+
+```bash
+# Test the data layer alone
+python stock_data.py
+```
+
+### `simple_version.py` — LangChain Chain
+
+**`create_analysis_prompt()`** — Creates a `ChatPromptTemplate` with `{ticker}`, `{company_name}`, `{financial_data}` placeholders. The system message sets Claude as a financial analyst; the human message provides data and asks for structured output.
+
+**`create_llm()`** — Initializes `ChatAnthropic` with `temperature=0` (deterministic for financial analysis) and `max_tokens=1024`.
+
+**`create_summary_chain()`** — The core LCEL chain:
 ```python
 chain = prompt | llm | parser
-result = chain.invoke({"ticker": "AAPL", "data": financial_data})
 ```
+The pipe operator composes components: prompt formats input → LLM generates response → parser extracts text string.
 
-### How It Works Step-by-Step
+**`analyze_stock(ticker)`** — Ties it together: fetch data → format for prompt → invoke chain → return result.
 
-```
-1. User enters "AAPL"
-       │
-       ▼
-2. stock_data.py calls SEC EDGAR API
-   GET https://data.sec.gov/api/xbrl/companyfacts/CIK0000320193.json
-       │
-       ▼
-3. Raw financial data extracted
-   {
-     "revenue": [{"val": 391035000000, "end": "2024-09-28"}],
-     "net_income": [{"val": 101218000000, "end": "2024-09-28"}],
-     ...
-   }
-       │
-       ▼
-4. Data injected into prompt template
-   "You are a financial analyst. Analyze AAPL with this data: ..."
-       │
-       ▼
-5. Claude generates analysis
-   "Apple Inc. continues to show strong fundamentals..."
-       │
-       ▼
-6. Output parser formats the response
-   Clean, structured summary displayed to user
-```
+---
 
-## 📊 Data Source: SEC EDGAR
+## 🛠️ Key LangChain Concepts
 
-This example reuses the SEC EDGAR API from the langgraph examples:
-
-- **Free** - No API key required
-- **Real data** - Actual company financials from SEC filings
-- **Rate limit** - 10 requests/second (be respectful)
-- **User-Agent** - Required header (set via `SEC_API_USER_AGENT` env var)
-
-### What We Fetch
-
-| Data Point | SEC XBRL Concept | Description |
-|-----------|-------------------|-------------|
-| Revenue | `Revenues` or `RevenueFromContractWithCustomerExcludingAssessedTax` | Total sales |
-| Net Income | `NetIncomeLoss` | Bottom line profit |
-| Total Assets | `Assets` | Everything the company owns |
-| Total Liabilities | `Liabilities` | Everything the company owes |
-| Operating Income | `OperatingIncomeLoss` | Profit from core operations |
-
-## 🛠️ Key LangChain Concepts You'll Learn
-
-### 1. PromptTemplate
-
-Templates let you create reusable prompts with variable placeholders:
-
+### PromptTemplate
+Templates separate instructions from data. Same template works for any ticker:
 ```python
-from langchain_core.prompts import ChatPromptTemplate
-
 prompt = ChatPromptTemplate.from_messages([
-    ("system", "You are a senior financial analyst at a top investment bank."),
-    ("human", """Analyze {ticker} based on this SEC filing data:
-
-Revenue: {revenue}
-Net Income: {net_income}
-Total Assets: {total_assets}
-
-Provide a concise stock summary.""")
+    ("system", "You are a senior financial analyst..."),
+    ("human", "Analyze {ticker} based on: {financial_data}")
 ])
 ```
 
-**Why this matters**: Templates separate your prompt logic from your data, making it reusable and testable.
-
-### 2. ChatAnthropic (LLM)
-
-The bridge between LangChain and Claude:
-
+### ChatAnthropic
+Connects LangChain to Claude. `temperature=0` = factual, consistent output:
 ```python
-from langchain_anthropic import ChatAnthropic
-
-llm = ChatAnthropic(
-    model="claude-sonnet-4-5-20250929",
-    temperature=0,        # Deterministic output for financial analysis
-    max_tokens=1024       # Limit response length
-)
+llm = ChatAnthropic(model="claude-sonnet-4-5-20250929", temperature=0)
 ```
 
-**Why `temperature=0`?** Financial analysis should be consistent and factual, not creative.
-
-### 3. StrOutputParser
-
-Converts the LLM's message object into a plain string:
-
+### LCEL (LangChain Expression Language)
+Compose chains with `|` — like Unix pipes:
 ```python
-from langchain_core.output_parsers import StrOutputParser
-
-parser = StrOutputParser()
-# Turns AIMessage(content="Analysis...") into just "Analysis..."
+chain = prompt | llm | StrOutputParser()
+result = chain.invoke({"ticker": "AAPL", "financial_data": "..."})
 ```
+LCEL chains automatically support `.stream()`, `.batch()`, and `.ainvoke()` for free.
 
-### 4. LCEL (The Pipe Operator)
-
-LangChain Expression Language lets you compose chains with `|`:
-
-```python
-# This creates a complete chain
-chain = prompt | llm | parser
-
-# Same as manually doing:
-# message = prompt.format_messages(ticker="AAPL", ...)
-# response = llm.invoke(message)
-# text = parser.parse(response)
-```
-
-**Why LCEL?** It's concise, composable, and supports streaming/batching for free.
+---
 
 ## 🧪 Testing
 
-### Good Test Cases
-
-| Ticker | Why It's Good | Expected Behavior |
-|--------|---------------|-------------------|
-| AAPL | Large, stable, well-known | Clean summary, all metrics available |
-| MSFT | Major tech company | Complete data, strong metrics |
-| TSLA | Volatile, high-growth | More interesting analysis, growth metrics |
-| JPM | Financial sector | Different metric focus (banking) |
-| AMZN | Mixed business model | Revenue vs profit tension |
-
-### Testing Incrementally
+| Ticker | Why | Expected |
+|--------|-----|----------|
+| AAPL | Stable large-cap | Clean summary, all metrics |
+| TSLA | Volatile growth | Interesting analysis |
+| JPM | Financial sector | Different metric focus |
+| INVALID | Error case | Graceful failure |
 
 ```bash
-# Step 1: Test data fetching
-python -c "from stock_data import get_stock_data; print(get_stock_data('AAPL'))"
+# Test data layer
+python stock_data.py
 
-# Step 2: Test the full chain
-python simple_version.py
-# Enter: AAPL
-
-# Step 3: Try a complex company
-python simple_version.py
-# Enter: TSLA
+# Test full chain
+echo "AAPL" | python simple_version.py
 ```
 
-## 🔧 Configuration
+---
 
-Edit `simple_version.py` to customize:
+## 🎯 Challenges
 
-```python
-# Change the model
-MODEL = "claude-sonnet-4-5-20250929"  # or "claude-haiku-4-5-20251001" for speed
+1. **Modify the prompt** — Change the system message to "risk-focused analyst". How does output change?
+2. **Try `temperature=0.7`** — Compare creative vs deterministic output
+3. **Add a metric** — Add `"EarningsPerShareDiluted"` to `METRICS_TO_EXTRACT` in `stock_data.py`
+4. **Remove the parser** — What does raw LLM output look like? (Hint: `AIMessage` object)
+5. **Add streaming** — Change `chain.invoke()` to `chain.stream()` and print tokens as they arrive
 
-# Adjust response length
-MAX_TOKENS = 1024
+---
 
-# Modify the analysis prompt
-SYSTEM_PROMPT = "You are a senior financial analyst..."
-```
+## ✅ Completion Checklist
 
-## 💡 Learning Outcomes
+- [ ] Ran `python simple_version.py` with AAPL
+- [ ] Ran `python stock_data.py` and saw real financial data
+- [ ] Understand `prompt | llm | parser` (LCEL)
+- [ ] Understand what `temperature=0` does
+- [ ] Tried at least one challenge
 
-After completing this example, you'll understand:
-
-- ✅ How to create and use `ChatPromptTemplate`
-- ✅ How to connect Claude via `ChatAnthropic`
-- ✅ How to parse LLM output with `StrOutputParser`
-- ✅ How to compose chains with LCEL (`prompt | llm | parser`)
-- ✅ How to invoke chains with variable input
-- ✅ How to fetch real financial data from SEC EDGAR
-- ✅ When LangChain is the right tool (vs LangGraph)
-
-## 🚧 Future Enhancements
-
-- [ ] Add `JsonOutputParser` for machine-readable output
-- [ ] Support multiple tickers in one run
-- [ ] Add comparison mode (AAPL vs MSFT)
-- [ ] Cache SEC data to reduce API calls
-- [ ] Add streaming output (watch analysis appear in real-time)
-- [ ] Export to PDF report
+---
 
 ## 📚 Resources
 
@@ -314,4 +194,4 @@ After completing this example, you'll understand:
 
 ---
 
-**Next up: [Financial News Analyzer](../02-financial-news-analyzer) — learn to chain multiple steps together →**
+**Next: [02 — Financial News Analyzer](../02-financial-news-analyzer) — chain multiple LLM calls together →**

@@ -1,72 +1,46 @@
 # 📄 SEC Filing Q&A
 
-A Retrieval-Augmented Generation (RAG) application that lets you ask natural language questions about SEC financial filings and get accurate, source-cited answers.
+A RAG (Retrieval-Augmented Generation) app that lets you ask natural language questions about SEC filings and get accurate, source-cited answers. All code is **complete and ready to run**.
 
 ## 🎯 What It Does
 
-Turns dense SEC filings into a conversational Q&A system:
-
-1. **Load** — Reads a 10-K or 10-Q filing (text format, included as sample data)
-2. **Chunk** — Splits the long document into manageable pieces
-3. **Embed** — Converts each chunk into a vector representation
-4. **Store** — Saves vectors in an in-memory vector store
+1. **Load** — Reads a 10-K filing (sample Apple filing included)
+2. **Chunk** — Splits the document into ~1000-char pieces with overlap
+3. **Embed** — Converts each chunk into a vector (HuggingFace, runs locally)
+4. **Store** — Indexes vectors in FAISS for fast similarity search
 5. **Query** — Finds the most relevant chunks for your question
 6. **Answer** — Claude generates an answer grounded in the retrieved context
 
-## 🌟 Why LangChain?
+## 🌟 Why LangChain (not LangGraph)?
 
-RAG is LangChain's **killer feature** — the pattern it's most known for:
+- ✅ **RAG is LangChain's killer feature** — built-in loaders, splitters, embeddings, vector stores
+- ✅ **Single-pass** — retrieve once, answer once
+- ❌ No iterative retrieval or conditional branching needed
 
-- ✅ **Document loading** — Built-in loaders for many file types
-- ✅ **Text splitting** — Smart chunking that preserves context
-- ✅ **Embeddings** — Convert text to vectors for similarity search
-- ✅ **Vector stores** — In-memory and persistent vector databases
-- ✅ **Retrieval chains** — Combine retrieval + generation in one chain
-
-**Why NOT LangGraph?**
-- ❌ No loops needed — retrieve once, answer once
-- ❌ No conditional branching — same flow for every question
-- ❌ No multi-agent coordination — single retriever + single generator
-
-**When WOULD you use LangGraph for RAG?**
-- If you need iterative retrieval ("that wasn't enough, search again with different terms")
-- If you need to route queries to different document stores
-- If you need human-in-the-loop verification of answers
-
-## 📁 Files in This Example
+## 📁 Files
 
 ```
 03-sec-filing-qa/
-├── README.md                # This file
-├── LEARNING_GUIDE.md        # Step-by-step TODO tutorial
-├── requirements.txt         # Python dependencies
-├── simple_version.py        # Main RAG implementation (has TODOs)
-├── filing_loader.py         # Document loading and chunking
+├── README.md              # This file
+├── requirements.txt       # Python dependencies
+├── simple_version.py      # Main RAG implementation
+├── filing_loader.py       # Document loading and chunking
 ├── data/
-│   └── sample_10k.txt       # Sample 10-K filing (Apple, excerpted)
+│   └── sample_10k.txt     # Apple 10-K filing (excerpted)
 └── examples/
-    └── EXAMPLE_OUTPUTS.md   # Sample Q&A outputs
+    └── EXAMPLE_OUTPUTS.md # Sample Q&A outputs
 ```
 
 ## 🚀 Quick Start
 
-### 1. Install Dependencies
-
 ```bash
 cd langchain/03-sec-filing-qa
 pip install -r requirements.txt
-```
-
-### 2. Set Up API Key
-
-```bash
 export ANTHROPIC_API_KEY="your-key-here"
-```
-
-### 3. Run It
-
-```bash
 python simple_version.py
+# Ask: "What was Apple's total revenue?"
+# Ask: "What are the main risk factors?"
+# Type: quit
 ```
 
 ### Example Session
@@ -74,401 +48,151 @@ python simple_version.py
 ```
 📄 SEC Filing Q&A System
 ========================================
+📂 Loading filing...
+✓ Loaded 1 document(s) (14,295 chars)
+✓ Split into 18 chunks (avg 858 chars each)
 
-Loading Apple Inc. 10-K filing...
-✓ Loaded 45 pages of filing text
-✓ Split into 128 chunks (avg ~500 tokens each)
-✓ Created embeddings and vector store
+📊 Building vector store...
+✓ Created vector store with 18 vectors
 
 Ready! Ask questions about the filing (type 'quit' to exit).
 
-You: What was Apple's total revenue last year?
+You: What was Apple's total revenue in fiscal 2024?
 
 🔍 Searching filing for relevant sections...
-✓ Found 4 relevant chunks
-
-🤖 Generating answer...
 
 Answer:
-  According to the 10-K filing, Apple's total net revenue
-  for fiscal year 2024 was $391.0 billion, compared to
-  $383.3 billion in the prior year, representing a 2%
-  year-over-year increase.
-
-  Sources:
-  • Item 6: Selected Financial Data (p. 23)
-  • Item 7: Revenue discussion (p. 28)
-
-────────────────────────────────────────
-
-You: What are the main risk factors?
-
-🔍 Searching filing for relevant sections...
-✓ Found 4 relevant chunks
-
-🤖 Generating answer...
-
-Answer:
-  The 10-K filing identifies several key risk factors:
-
-  1. **Macroeconomic conditions** — Global economic
-     uncertainty could reduce consumer spending
-  2. **Supply chain** — Reliance on single-source
-     components and concentration in specific regions
-  3. **Competition** — Intense competition in all
-     product categories
-  4. **Regulatory** — Increasing regulation globally,
-     particularly in the EU (Digital Markets Act)
-  5. **Foreign exchange** — Significant international
-     revenue exposed to currency fluctuations
-
-  Sources:
-  • Item 1A: Risk Factors (pp. 8-18)
-
-────────────────────────────────────────
-
-You: quit
-Goodbye!
+  According to the 10-K filing, Apple's total net revenue for
+  fiscal year 2024 was $391.0 billion ($391,035 million):
+  - Products: $295.0 billion (-1% YoY)
+  - Services: $96.0 billion (+13% YoY)
+  Sources: Item 7 (MD&A) and Item 8 (Financial Statements)
 ```
 
 ## 🏗️ Architecture
 
-### RAG Pipeline
-
 ```
-                    ┌─────────────────────────────────────────────────┐
-                    │            INDEXING (one-time setup)             │
-                    │                                                 │
-                    │  ┌──────────┐  ┌──────────┐  ┌──────────────┐ │
-                    │  │  Load    │→ │  Split   │→ │  Embed +     │ │
-                    │  │  Filing  │  │  Chunks  │  │  Store       │ │
-                    │  └──────────┘  └──────────┘  └──────────────┘ │
-                    │  TextLoader    RecursiveText   HuggingFace     │
-                    │                Splitter        Embeddings +    │
-                    │                                FAISS           │
-                    └─────────────────────────────────────────────────┘
+INDEXING (one-time):
+Filing text → Chunk (RecursiveTextSplitter) → Embed (HuggingFace) → Store (FAISS)
 
-                    ┌─────────────────────────────────────────────────┐
-                    │           QUERYING (per question)               │
-                    │                                                 │
-                    │  ┌──────────┐  ┌──────────┐  ┌──────────────┐ │
-                    │  │ Question │→ │ Retrieve │→ │  Generate    │ │
-                    │  │          │  │ Top-K    │  │  Answer      │ │
-                    │  └──────────┘  └──────────┘  └──────────────┘ │
-                    │  User input    FAISS          Claude +         │
-                    │                similarity     Retrieved        │
-                    │                search         context          │
-                    └─────────────────────────────────────────────────┘
-```
-
-### How RAG Works (Step by Step)
-
-```
-Phase 1: INDEXING (happens once when app starts)
-═══════════════════════════════════════════════
-
-SEC Filing (long text document)
-    │
-    ▼
-┌───────────────────────────────────────────┐
-│ Text Splitter                             │
-│ Breaks into chunks of ~500 tokens         │
-│ with ~50 token overlap                    │
-│                                           │
-│ "Apple's total revenue..." → Chunk 1      │
-│ "Risk factors include..." → Chunk 2       │
-│ "The company operates..."  → Chunk 3      │
-│ ... (128 chunks total)                    │
-└────────────────────┬──────────────────────┘
-                     │
-                     ▼
-┌───────────────────────────────────────────┐
-│ Embedding Model                           │
-│ Converts each chunk to a vector           │
-│ (list of ~384 numbers)                    │
-│                                           │
-│ Chunk 1 → [0.12, -0.34, 0.56, ...]      │
-│ Chunk 2 → [0.78, 0.23, -0.11, ...]      │
-│ Chunk 3 → [0.45, -0.67, 0.89, ...]      │
-└────────────────────┬──────────────────────┘
-                     │
-                     ▼
-┌───────────────────────────────────────────┐
-│ Vector Store (FAISS)                      │
-│ Stores all chunks + their vectors         │
-│ Enables fast similarity search            │
-└───────────────────────────────────────────┘
-
-
-Phase 2: QUERYING (happens per question)
-═══════════════════════════════════════════════
-
-User: "What was Apple's revenue?"
-    │
-    ▼
-┌───────────────────────────────────────────┐
-│ Embed the Question                        │
-│ Same model as indexing                    │
-│ "What was Apple's revenue?" → [0.11, ...] │
-└────────────────────┬──────────────────────┘
-                     │
-                     ▼
-┌───────────────────────────────────────────┐
-│ Similarity Search                         │
-│ Find top-4 chunks closest to question     │
-│                                           │
-│ Match 1: "Total net revenue was $391.0B"  │ ← Most similar
-│ Match 2: "Revenue by segment: iPhone..."  │
-│ Match 3: "Revenue grew 2% year-over..."  │
-│ Match 4: "Services revenue reached..."    │
-└────────────────────┬──────────────────────┘
-                     │
-                     ▼
-┌───────────────────────────────────────────┐
-│ Prompt + Claude                           │
-│                                           │
-│ System: "Answer based ONLY on context"    │
-│ Context: [4 retrieved chunks]             │
-│ Question: "What was Apple's revenue?"     │
-│                                           │
-│ → "Apple's total net revenue for fiscal   │
-│    year 2024 was $391.0 billion..."       │
-└───────────────────────────────────────────┘
+QUERYING (per question):
+Question → Embed → Similarity Search → Top-K chunks → Prompt + Claude → Answer
 ```
 
 ### LCEL Implementation
 
 ```python
-from langchain_core.runnables import RunnablePassthrough
-
-# The retriever fetches relevant chunks
-retriever = vector_store.as_retriever(search_kwargs={"k": 4})
-
-# Format retrieved documents into a single string
-def format_docs(docs):
-    return "\n\n".join(doc.page_content for doc in docs)
-
-# The RAG chain
 rag_chain = (
     {"context": retriever | format_docs, "question": RunnablePassthrough()}
     | prompt
     | llm
     | StrOutputParser()
 )
-
-# Ask a question
 answer = rag_chain.invoke("What was Apple's revenue?")
 ```
 
-## 📊 Data: Sample SEC Filing
+The `{"context": ..., "question": ...}` creates a `RunnableParallel`: the retriever and passthrough run simultaneously, then results merge into a dict for the prompt.
 
-This example includes a **sample 10-K filing excerpt** (`data/sample_10k.txt`) so you don't need to download anything.
+---
 
-### What's in the Sample File?
+## 📖 Code Walkthrough
 
-An excerpted Apple 10-K annual filing containing:
-- **Item 1**: Business description
-- **Item 1A**: Risk factors
-- **Item 6**: Selected financial data
-- **Item 7**: Management's discussion and analysis (MD&A)
-- **Item 8**: Financial statements (condensed)
+### `filing_loader.py` — Indexing Phase
 
-### Why a Sample File?
+**`load_filing()`** — Uses `TextLoader` to read `data/sample_10k.txt` into a LangChain `Document` (has `.page_content` and `.metadata`).
 
-- **No API calls needed** for the RAG part (fast iteration)
-- **Consistent** results for everyone
-- **Focused** content that demonstrates RAG well
-- **Extendable** — swap in any 10-K text file
+**`split_into_chunks()`** — Uses `RecursiveCharacterTextSplitter` with `chunk_size=1000` and `chunk_overlap=200`. Splits at natural boundaries: paragraphs → lines → sentences → words.
 
-### Using Real Filings
+- **Why chunk?** Filing is too long to send entirely to Claude. We only need relevant sections.
+- **Why overlap?** Prevents losing context at chunk boundaries.
 
-Once the example works, you can replace the sample with real filings:
-```python
-# Download from SEC EDGAR
-# https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=AAPL&type=10-K
-# Save the filing text to data/your_filing.txt
+```bash
+python filing_loader.py  # See chunk statistics
 ```
 
-## 🛠️ Key LangChain Concepts You'll Learn
+### `simple_version.py` — RAG Pipeline
 
-### 1. Document Loaders
+**`create_vector_store(chunks)`** — Embeds all chunks using `HuggingFaceEmbeddings` (runs locally, ~80MB model, no API key) and stores in FAISS for fast similarity search.
 
-Load documents from various sources:
+**`create_retriever(vector_store)`** — Wraps FAISS into LangChain's retriever interface: `retriever.invoke("revenue")` → top-4 matching chunks.
 
-```python
-from langchain_community.document_loaders import TextLoader
+**`create_rag_prompt()`** — The critical grounding prompt. Tells Claude to:
+- Answer **ONLY** from the provided context
+- Say "I don't have that information" when unsure
+- Cite specific data points
 
-loader = TextLoader("data/sample_10k.txt")
-documents = loader.load()
-# Returns: [Document(page_content="...", metadata={"source": "..."})]
+Without these rules, Claude might hallucinate answers from training data.
+
+**`create_rag_chain(retriever)`** — Composes the full RAG chain. The `RunnableParallel` runs retrieval and question passthrough simultaneously, then feeds both into the prompt.
+
+---
+
+## 🛠️ Key LangChain Concepts
+
+### Embeddings
+Convert text to vectors where similar meanings are close together:
+```
+"Apple's revenue was $391 billion"  → [0.12, -0.34, ...]
+"What was Apple's total sales?"     → [0.13, -0.33, ...]  ← Close!
+"Risk factors include competition"  → [0.78, 0.23, ...]   ← Far away
 ```
 
-**Other loaders**: `PyPDFLoader`, `CSVLoader`, `WebBaseLoader`, `UnstructuredHTMLLoader`
+### Vector Store (FAISS)
+Stores all chunk vectors and enables fast nearest-neighbor search. When you query, your question is embedded with the same model and compared to all stored vectors.
 
-### 2. Text Splitters
-
-Break long documents into chunks with overlap:
-
+### The RAG Chain Pattern
 ```python
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-
-splitter = RecursiveCharacterTextSplitter(
-    chunk_size=1000,      # Max characters per chunk
-    chunk_overlap=200,    # Overlap between adjacent chunks
-    separators=["\n\n", "\n", ". ", " "]  # Split at natural boundaries
-)
-
-chunks = splitter.split_documents(documents)
-# Returns: [Document(page_content="chunk 1..."), Document(page_content="chunk 2..."), ...]
-```
-
-**Why overlap?** A relevant sentence might straddle two chunks. Overlap ensures context isn't lost at boundaries.
-
-### 3. Embeddings
-
-Convert text to numerical vectors for similarity search:
-
-```python
-from langchain_community.embeddings import HuggingFaceEmbeddings
-
-embeddings = HuggingFaceEmbeddings(
-    model_name="all-MiniLM-L6-v2"  # Small, fast, free (runs locally)
-)
-
-# Convert text to vector
-vector = embeddings.embed_query("What was Apple's revenue?")
-# Returns: [0.12, -0.34, 0.56, ...] (384 dimensions)
-```
-
-**Why HuggingFace?** It's free and runs locally. No API key needed. For production, consider OpenAI or Cohere embeddings.
-
-### 4. Vector Stores
-
-Store and search document vectors:
-
-```python
-from langchain_community.vectorstores import FAISS
-
-# Create vector store from documents
-vector_store = FAISS.from_documents(chunks, embeddings)
-
-# Search for similar chunks
-results = vector_store.similarity_search("revenue", k=4)
-# Returns: Top 4 chunks most similar to "revenue"
-```
-
-**FAISS** (Facebook AI Similarity Search) — fast, in-memory, no setup needed. For production, consider Pinecone, Weaviate, or ChromaDB.
-
-### 5. Retrieval Chain
-
-Combine retrieval with generation:
-
-```python
-retriever = vector_store.as_retriever(search_kwargs={"k": 4})
-
 rag_chain = (
     {"context": retriever | format_docs, "question": RunnablePassthrough()}
-    | prompt
-    | llm
-    | StrOutputParser()
+    | prompt | llm | parser
 )
 ```
+`RunnablePassthrough()` passes the question through unchanged while the retriever fetches relevant chunks.
 
-The `{"context": ..., "question": ...}` syntax creates a `RunnableParallel` that runs the retriever and passes the question through simultaneously.
+---
 
 ## 🧪 Testing
 
-### Good Questions to Try
-
-| Question | What It Tests |
-|----------|---------------|
+| Question | Tests |
+|----------|-------|
 | "What was Apple's total revenue?" | Simple fact retrieval |
 | "What are the main risk factors?" | Multi-point retrieval |
-| "How did iPhone sales perform?" | Segment-specific data |
-| "What is Apple's debt situation?" | Financial statement data |
-| "Who is Apple's CEO?" | Business description |
-| "What is the meaning of life?" | Out-of-scope handling |
-
-### Testing Incrementally
+| "How did iPhone sales perform?" | Segment data |
+| "How much did Apple return to shareholders?" | Capital allocation |
+| "What is Bitcoin's price?" | Out-of-scope (should say "I don't know") |
 
 ```bash
-# Step 1: Test document loading
-python -c "from filing_loader import load_and_chunk; chunks = load_and_chunk(); print(f'{len(chunks)} chunks')"
-
-# Step 2: Test the full Q&A system
-python simple_version.py
-# Ask: "What was Apple's revenue?"
-
-# Step 3: Test out-of-scope questions
-# Ask: "What is Bitcoin's price?"
-# Should say "I don't have that information in the filing"
+python filing_loader.py  # Test chunking
+printf "What was Apple's revenue?\nquit\n" | python simple_version.py  # Test RAG
 ```
 
-## 🔧 Configuration
+---
 
-```python
-# Chunking parameters
-CHUNK_SIZE = 1000        # Characters per chunk (larger = more context, fewer chunks)
-CHUNK_OVERLAP = 200      # Overlap between chunks (larger = more redundancy, better recall)
+## 🎯 Challenges
 
-# Retrieval parameters
-TOP_K = 4                # Number of chunks to retrieve per query
+1. **Change chunk size** — Try 500 vs 2000 in `filing_loader.py`. How does Q&A quality change?
+2. **Change top-K** — Retrieve 2 vs 8 chunks. When does more context help vs hurt?
+3. **Remove the grounding constraint** — Delete "ONLY" from the prompt and ask "What is Bitcoin?" — see what happens
+4. **Print retrieved chunks** — Add a print before the LLM call to see what was retrieved
+5. **Swap the filing** — Replace `sample_10k.txt` with any company's 10-K text
 
-# Embedding model
-EMBEDDING_MODEL = "all-MiniLM-L6-v2"  # Free, local, ~80MB download
+---
 
-# LLM
-MODEL = "claude-sonnet-4-5-20250929"
-TEMPERATURE = 0          # Factual answers only
-```
+## ✅ Completion Checklist
 
-### Tuning Tips
-
-| Parameter | Too Small | Too Large |
-|-----------|-----------|-----------|
-| `CHUNK_SIZE` | Loses context, fragmented answers | Retrieves too much noise |
-| `CHUNK_OVERLAP` | Misses boundary content | Wastes storage, slower |
-| `TOP_K` | Might miss relevant info | Includes irrelevant context |
-
-## 💡 Learning Outcomes
-
-After completing this example, you'll understand:
-
-- ✅ The **RAG pattern** — when and why to use retrieval-augmented generation
-- ✅ **Document loaders** — loading text files into LangChain Documents
-- ✅ **Text splitters** — chunking strategies and why overlap matters
-- ✅ **Embeddings** — converting text to vectors for similarity search
-- ✅ **Vector stores** — storing and querying document vectors with FAISS
-- ✅ **Retrieval chains** — combining retrieval + generation with LCEL
-- ✅ **Grounded answers** — making LLMs answer from source documents only
-
-## 🔗 Comparison: Progressive Complexity
-
-| Feature | 01-Stock Summary | 02-News Analyzer | 03-Filing Q&A |
-|---------|-----------------|------------------|---------------|
-| Chain steps | 1 | 3 (sequential) | 2 (retrieve + generate) |
-| Data source | SEC API (live) | Sample headlines | Local document |
-| Key concept | LCEL basics | RunnablePassthrough | RAG pipeline |
-| New concepts | — | Chain composition | Embeddings, vectors, retrieval |
-
-## 🚧 Future Enhancements
-
-- [ ] Support PDF filing uploads (PyPDFLoader)
-- [ ] Persistent vector store (save to disk, reload later)
-- [ ] Chat history (follow-up questions with context)
-- [ ] Multi-document Q&A (compare two filings)
-- [ ] Source highlighting (show exact paragraphs used)
-- [ ] Streaming answers (token by token)
-- [ ] Citation with page numbers
+- [ ] Asked 3+ questions and got grounded answers
+- [ ] Verified an answer against the raw `sample_10k.txt`
+- [ ] Asked an out-of-scope question and got "I don't have that information"
+- [ ] Understand indexing (chunk → embed → store) vs querying (retrieve → generate)
+- [ ] Tried at least one challenge
 
 ## 📚 Resources
 
 - [LangChain RAG Tutorial](https://python.langchain.com/docs/tutorials/rag/)
 - [Text Splitters Guide](https://python.langchain.com/docs/how_to/#text-splitters)
 - [Vector Store Integrations](https://python.langchain.com/docs/integrations/vectorstores/)
-- [FAISS Documentation](https://faiss.ai/)
-- [HuggingFace Embeddings](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2)
+- [FAISS](https://faiss.ai/)
 
 ---
 
-**Next up: [Portfolio Report Generator](../04-portfolio-report-generator) — learn structured output and batch processing →**
+**Next: [04 — Portfolio Report Generator](../04-portfolio-report-generator) — structured output and batch processing →**
