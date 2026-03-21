@@ -1,0 +1,16 @@
+# Prometheus config for Docker Compose setup
+# (separate from prometheus.yml.example which is for manual installs)
+
+global:
+  scrape_interval: 60s
+  evaluation_interval: 60s
+
+rule_files:
+  - "prometheus_alerts.yml"
+
+scrape_configs:
+  - job_name: 'langsmith'
+    static_configs:
+      - targets: ['langsmith-exporter:8001']
+    scrape_interval: 60s
+    scrape_timeout: 10s

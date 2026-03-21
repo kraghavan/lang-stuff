@@ -164,6 +164,17 @@ if should_run "05"; then
 fi
 
 # ═══════════════════════════════════════════════
+# 06: Observability (LangSmith)
+# ═══════════════════════════════════════════════
+
+if should_run "06"; then
+    print_header "06 — Observability (LangSmith)"
+
+    run_test "01-setup/test_connection.py" "06-observability/01-setup" "python test_connection.py || true" 10
+    run_test "04-evaluate-fraud/run_evaluation.py" "06-observability/04-evaluate-fraud" "python run_evaluation.py" 60
+fi
+
+# ═══════════════════════════════════════════════
 # Summary
 # ═══════════════════════════════════════════════
 

@@ -1,0 +1,56 @@
+# Prometheus alert rules for LangSmith AI metrics
+#
+# These fire when AI costs, latency, or error rates exceed thresholds.
+# Add to your prometheus.yml: rule_files: ["prometheus_alerts.yml"]
+
+groups:
+  - name: langsmith_ai_performance
+    interval: 60s
+    rules:
+      # Daily AI costs exceed $100
+      - alert: HighAICostDaily
+        expr: sum(langsmith_run_cost_usd) > 100
+        for: 5m
+        labels:
+          severity: warning
+          component: ai
+        annotations:
+          summary: "AI costs exceeded $100 cumulative"
+          description: "Total LangSmith costs: ${{ $value | humanize }}"
+
+      # p95 latency > 10 seconds
+      - alert: HighAILatency
+        expr: histogram_quantile(0.95, rate(langsmith_latency_seconds_bucket[5m])) > 10
+        for: 5m
+        labels:
+          severity: warning
+          component: ai
+        annotations:
+          summary: "AI workflow p95 latency > 10s"
+          description: "{{ $labels.example }}: p95 = {{ $value | humanize }}s"
+
+      # Error rate > 5%
+      - alert: HighAIErrorRate
+        expr: |
+          sum(rate(langsmith_requests_total{status!="success"}[5m]))
+          /
+          sum(rate(langsmith_requests_total[5m]))
+          > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          component: ai
+        annotations:
+          summary: "AI error rate > 5%"
+          description: "Error rate: {{ $value | humanizePercentage }}"
+
+      # Trading Team negotiations exceeding 2 rounds
+      - alert: ExcessiveNegotiations
+        expr: histogram_quantile(0.95, rate(langsmith_negotiation_rounds_bucket[10m])) > 2
+        for: 10m
+        labels:
+          severity: info
+          component: trading_team
+        annotations:
+          summary: "Trading Team struggling to find trades"
+          description: "p95 negotiation rounds: {{ $value | humanize }}"

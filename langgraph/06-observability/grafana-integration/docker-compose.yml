@@ -1,0 +1,64 @@
+# LangSmith → Prometheus → Grafana Stack
+#
+# Spins up the full observability stack in one command.
+# No need to install Prometheus or Grafana locally.
+#
+# Usage:
+#   export LANGCHAIN_API_KEY="lsv2_pt_..."
+#   docker compose up -d
+#
+# Access:
+#   Grafana:    http://localhost:3000 (admin/admin)
+#   Prometheus: http://localhost:9090
+#   Exporter:   http://localhost:8001/metrics
+#
+# Import dashboard:
+#   Grafana → Dashboards → Import → Upload grafana_dashboard.json
+
+services:
+  # LangSmith → Prometheus exporter
+  langsmith-exporter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      - LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY}
+      - LANGCHAIN_PROJECT=${LANGCHAIN_PROJECT:-langgraph-learning}
+      - POLL_INTERVAL=${POLL_INTERVAL:-60}
+      - EXPORTER_PORT=8001
+    restart: unless-stopped
+
+  # Prometheus — scrapes the exporter
+  prometheus:
+    image: prom/prometheus:v2.51.0
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus-docker.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus_alerts.yml:/etc/prometheus/prometheus_alerts.yml:ro
+      - prometheus-data:/prometheus
+    restart: unless-stopped
+    depends_on:
+      - langsmith-exporter
+
+  # Grafana — dashboards
+  grafana:
+    image: grafana/grafana:10.4.0
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana-provisioning:/etc/grafana/provisioning:ro
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+
+volumes:
+  prometheus-data:
+  grafana-data:

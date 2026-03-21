@@ -545,6 +545,9 @@ After completing all 5, you'll understand:
 - ✅ Deep agents (ReAct + tool calling)
 - ✅ Multi-agent architectures
 
+### Bonus: Observability (LangSmith)
+After completing the 5 examples, add production monitoring with [06-observability](./06-observability/) — trace agent decisions, debug tool-calling loops, evaluate accuracy, and track costs.
+
 ---
 
 **Ready to build? Start with [CI/CD Status Tracker](./01-ci-cd-tracker) →**
