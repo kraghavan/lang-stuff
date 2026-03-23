@@ -28,8 +28,7 @@ export LANGCHAIN_TRACING_V2=true
 lang-stuff/
 ├── langchain/         ← Simple chains and patterns (4 examples)
 ├── langgraph/         ← Complex agentic workflows (5 examples + observability)
-├── langsmith/         ← Points to langgraph/06-observability
-└── langflow/          ← Visual workflow builder (planned)
+└── langsmith/         ← Points to langgraph/06-observability
 ```
 
 ## 🎓 Learning Path

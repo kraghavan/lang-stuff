@@ -29,8 +29,7 @@ lang-stuff/
 │   ├── 06-observability/            # LangSmith tracing + Grafana integration
 │   └── smoke_test.sh                 # 12 tests
 │
-├── langsmith/                          # Points to langgraph/06-observability
-└── langflow/                           # Planned
+└── langsmith/                          # Points to langgraph/06-observability
 ```
 
 ## API Keys Required
